@@ -60,6 +60,57 @@ html, body {
   }
 
 
+
+/* LOGIN
+-------------------------*/
+.login-section {
+  min-height: 50vh;
+}
+
+/* Custom orange button used on register + login */
+.orange-btn {
+  background-color: #FF5E1D;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+.orange-btn:hover {
+  background-color: #92D36E;
+  color: #1C2C39;
+}
+
+
+/* INDEX
+-------------------------*/
+.homepage-heading {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.home-section {
+  margin-bottom: 3rem;
+}
+
+.section-heading {
+  color: #1c2c39;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.section-paragraph {
+  font-size: 1rem;
+  color: #1c2c39;
+  margin-bottom: 1rem;
+}
+
+.decorative-image {
+  max-width: 400px;
+  height: auto;
+}
+
   /* FOOTER
 -------------------------*/
 .site-footer {
