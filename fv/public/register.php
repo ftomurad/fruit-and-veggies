@@ -2,8 +2,8 @@
 /**
  * REGISTER NEW CUSTOMER
  * -------------------------------------------------
- * 1. Load header, DB connection and sanitization functions
- * 2. If POSTED -- sanitise, do validation, insert row
+ * 1. Header
+ * 2. IF Submitted -- sanitise, do validation, insert row
  * 3. Echo registration form and error list
  */
 
