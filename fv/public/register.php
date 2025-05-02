@@ -5,6 +5,7 @@
  * 1. Header
  * 2. IF Submitted -- sanitise, do validation, insert row
  * 3. Echo registration form and error list
+ * 4. Footer
  */
 
 require_once '../template/header.php';   // header starts session & nav
