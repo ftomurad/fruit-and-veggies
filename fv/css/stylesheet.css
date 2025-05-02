@@ -7,7 +7,21 @@ html, body {
     font-family: "Trebuchet MS", sans-serif;
     color: #333;
   }
-  
+
+/* Orange button */
+.orange-btn {
+  background-color: #FF5E1D;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+.orange-btn:hover {
+  background-color: #92D36E;
+  color: #1C2C39;
+}
 
   /* HEADER
   -------------------------*/
@@ -65,21 +79,6 @@ html, body {
 -------------------------*/
 .login-section {
   min-height: 50vh;
-}
-
-/* Custom orange button used on register + login */
-.orange-btn {
-  background-color: #FF5E1D;
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out;
-}
-.orange-btn:hover {
-  background-color: #92D36E;
-  color: #1C2C39;
 }
 
 
