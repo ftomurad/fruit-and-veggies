@@ -110,6 +110,25 @@ html, body {
   height: auto;
 }
 
+/* USERS
+-------------------------*/
+
+/* Page numbering */
+.page-link-custom {
+  color: #1C2C39;
+}
+
+.page-item.active .page-link {
+  background-color: #1C2C39;
+  border-color: #1C2C39;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #92D36E;
+  color: #1C2C39;
+}
+
   /* FOOTER
 -------------------------*/
 .site-footer {
