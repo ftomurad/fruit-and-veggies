@@ -3,14 +3,14 @@
  * REGISTER NEW CUSTOMER
  * -------------------------------------------------
  * 1. Header
- * 2. IF Submitted -- sanitise, do validation, insert row
- * 3. Echo registration form and error list
+ * 2. IF POSTed do sanitise, validate and insert in DB
+ * 3. Display registration form and error list
  * 4. Footer
  */
 
-require_once '../template/header.php';   // header starts session & nav
-require_once '../src/dbconnect.php';    // $connection (PDO)
-require_once '../common.php';           // escape()
+require_once '../template/header.php';
+require_once '../src/dbconnect.php'; 
+require_once '../common.php';  
 
 // variables
 $errors  = [];
@@ -19,152 +19,69 @@ $isSaved = false;
 // PHP logic part ----------------------------------------------
 if (isset($_POST['Submit'])) {
 
-    // sanitise data
-    $name = '';
-    if (isset($_POST['name'])) {
-        $name = escape($_POST['name']);
-    }
-    
-    $surname = '';
-    if (isset($_POST['surname'])) {
-        $surname = escape($_POST['surname']);
-    }
-    
-    $email = '';
-    if (isset($_POST['email'])) {
-        $email = escape($_POST['email']);
-    }
-    
-    $username = '';
-    if (isset($_POST['username'])) {
-        $username = escape($_POST['username']);
-    }
-    
-    $password = '';
-    if (isset($_POST['password'])) {
-        $password = escape($_POST['password']);
-    }
-    
-    $password2 = '';
-    if (isset($_POST['password2'])) {
-        $password2 = escape($_POST['password2']);
-    }
-    
-    $phone = '';
-    if (isset($_POST['phone'])) {
-        $phone = escape($_POST['phone']);
-    }
-    
-    $addr1 = '';
-    if (isset($_POST['address1'])) {
-        $addr1 = escape($_POST['address1']);
-    }
-    
-    $addr2 = '';
-    if (isset($_POST['address2'])) {
-        $addr2 = escape($_POST['address2']);
-    }
-    
-    $eircode = '';
-    if (isset($_POST['eircode'])) {
-        $eircode = escape($_POST['eircode']);
-    }
-    
+  // 1. create and sanitize associative array
+  $new_user = [
+      'username'       => escape($_POST['username'] ?? ''),
+      'password'       => escape($_POST['password'] ?? ''),
+      'role'           => 'CUSTOMER',
+      'name'           => escape($_POST['name'] ?? ''),
+      'surname'        => escape($_POST['surname'] ?? ''),
+      'email'          => escape($_POST['email'] ?? ''),
+      'phone'          => escape($_POST['phone'] ?? ''),
+      'address_line1'  => escape($_POST['address1'] ?? ''),
+      'address_line2'  => escape($_POST['address2'] ?? ''),
+      'eircode'        => escape($_POST['eircode'] ?? '')
+  ];
 
+  $password2 = escape($_POST['password2'] ?? '');
 
-    // validate that fields are not empty
-    if ($name === '') {
-      $errors[] = 'Please enter your first name.';
-    }
-    if ($surname === '') {
-      $errors[] = 'Please enter your last name.';
-    }
-    if ($email === '') {
-      $errors[] = 'Please enter your email.';
-    }
-    if ($username === '') {
-      $errors[] = 'Please enter a username.';
-    }
-    if ($password === '') {
-      $errors[] = 'Please enter a password.';
-    }
-    if ($password2 === '') {
-      $errors[] = 'Please confirm your password.';
-    }
-    if ($phone === '') {
-      $errors[] = 'Please enter your phone number.';
-    }
-    if ($addr1 === '') {
-      $errors[] = 'Please enter your address.';
-    }
-    if ($eircode === '') {
-      $errors[] = 'Please enter your eircode.';
-    }
-  
-    // passwords 1and2 must match
-    if ($password !== $password2) {
-        $errors[] = 'Passwords dont match.';
-    }
+  // 2. validate required fields
+  foreach (['name','surname','email','username','password','phone','address_line1','eircode'] as $field) {
+      if ($new_user[$field] === '') {
+          $errors[] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
+      }
+  }
 
-    
-    // check if duplicate username exist
-    if (!$errors) {
-  // 1. create associative array
-      $check = ['username' => $username];
+  // 3. confirm passwords match
+  if ($new_user['password'] !== $password2) {
+      $errors[] = 'Passwords don’t match.';
+  }
 
-  // 2. build SQL using key
+  // 4. check if username already exists
+  if (!$errors) {
+      $check = ['username' => $new_user['username']];
       $sql = sprintf(
-      "SELECT id FROM users WHERE %s = :%s LIMIT 1",
-      key($check), key($check) // both 'username'
+          "SELECT id FROM users WHERE %s = :%s LIMIT 1",
+          key($check), key($check)
       );
-
-  // 3. prepare and execute
       $stmt = $connection->prepare($sql);
       $stmt->execute($check);
 
-  // 4. check result
       if ($stmt->fetch()) {
-      $errors[] = 'Username already exists – pick another.';
+          $errors[] = 'Username already exists – pick another.';
       }
-}
+  }
 
-    // insert
-    if (!$errors) {
+  // 5. insert into DB
+  if (!$errors) {
       try {
-          // 1. create associative array
-          $new_user = [
-              'username'       => $username,
-              'password'       => $password,
-              'role'           => 'CUSTOMER',
-              'name'           => $name,
-              'surname'        => $surname,
-              'email'          => $email,
-              'phone'          => $phone,
-              'address_line1'  => $addr1,
-              'address_line2'  => $addr2,
-              'eircode'        => $eircode
-          ];
-  
-          // 2. build SQL statement
           $sql = sprintf(
               "INSERT INTO users (%s) VALUES (%s)",
               implode(", ", array_keys($new_user)),
               ":" . implode(", :", array_keys($new_user))
           );
-  
-          // 3. prepare and execute with array
+
           $stmt = $connection->prepare($sql);
           $stmt->execute($new_user);
-  
-          // redirect
+
           header("Location: login.php");
           exit;
-  
+
       } catch (PDOException $e) {
           $errors[] = "Database error: " . $e->getMessage();
       }
   }
-}  
+} 
 ?>
 
 <!-- HTML part ----------------------------------------- -->
