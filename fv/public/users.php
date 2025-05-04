@@ -22,20 +22,20 @@ $errors = [];
 $editUser = null;
 
 // Pages
-$perPage = 10;
-$page = 1;
-
-//Sanitize GET
+$perPage = 10; // rows per page
+// figure out what page we are on
 if (isset($_GET['page'])) {
-  $rawPage = escape($_GET['page']);
+    $page = (int) $_GET['page'];         // converts to int
+} else {
+    $page = 1;                           // default page
 }
-
 $offset = ($page - 1) * $perPage;
 
 // Handle POST
 if (isset($_POST['action'])) {
-    $action = $_POST['action'] ?? '';
-    $id     = $_POST['id'] ?? '';
+
+    $action = isset($_POST['action']) ? $_POST['action'] : '';
+    $id     = isset($_POST['id'])     ? $_POST['id']     : '';
 
     // sanitize input
     $user = [
@@ -64,7 +64,8 @@ if (isset($_POST['action'])) {
     if ($action === 'save' && !$errors) {
       $sql = "SELECT id FROM users WHERE username = :username";
       $params = ['username' => $user['username']];
-      if ($id !== '') { //skip current user with this ID, if ID is empty
+
+      if ($id !== '') { //skip current user with this ID, ignore current row
           $sql .= " AND id <> :id";
           $params['id'] = $id;
       }
@@ -119,14 +120,15 @@ if (isset($_POST['action'])) {
   }  
 }
 
-// Load for edit
+// When EDIT is pressed
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $stmt = $connection->prepare("SELECT * FROM users WHERE id = :id");
     $stmt->execute(['id' => $_GET['id']]);
-    $editUser = $stmt->fetch(PDO::FETCH_ASSOC); //fetch single row from DB and return as an associative array in this format: 'id' => 1, 'username' => 'john', etc...
+    //fetch single row from DB and return as an associative array in this format: 'id' => 1, 'username' => 'john', etc...
+    $editUser = $stmt->fetch(PDO::FETCH_ASSOC); 
 }
 
-// List and pages
+// list and pages
 $stmt = $connection->prepare("SELECT * FROM users ORDER BY id ASC LIMIT $offset, $perPage");
 $stmt->execute();
 $users = $stmt->fetchAll();
@@ -149,30 +151,51 @@ $pages = ceil($total / $perPage);
   <?php endif; ?>
 
   <!-- FORM part -->
-  <form method="post" class="border rounded p-4 bg-light mb-4" novalidate>
-    <input type="hidden" name="id" value="<?php echo $editUser['id'] ?? ''; ?>">
+  <form method="post"
+        class="border rounded p-4 bg-light mb-4">
 
-    <!--name -->
+    <!-- hidden ID -->
+    <input type="hidden"
+           name="id"
+           value="<?php echo (isset($editUser['id']) ? $editUser['id'] : ''); ?>">
+
+    <!-- name and surname -->
     <div class="row mb-2">
       <div class="col">
-        <label>First Name</label>
-        <input name="name" class="form-control" value="<?php echo escape($editUser['name'] ?? ''); ?>" required>
+        <label>First&nbsp;Name</label>
+        <input  name="name"
+                class="form-control"
+                value="<?php echo escape(isset($editUser['name']) ? $editUser['name'] : ''); ?>"
+                minlength="3"
+                required>
       </div>
       <div class="col">
-        <label>Last Name</label>
-        <input name="surname" class="form-control" value="<?php echo escape($editUser['surname'] ?? ''); ?>" required>
+        <label>Last&nbsp;Name</label>
+        <input  name="surname"
+                class="form-control"
+                value="<?php echo escape(isset($editUser['surname']) ? $editUser['surname'] : ''); ?>"
+                minlength="3"
+                required>
       </div>
     </div>
 
-    <!-- username and pass -->
+    <!-- username and password -->
     <div class="row mb-2">
       <div class="col">
         <label>Username</label>
-        <input name="username" class="form-control" title="Only letters and numbers" value="<?php echo escape($editUser['username'] ?? ''); ?>" required>
+        <input  name="username"
+                class="form-control"
+                value="<?php echo escape(isset($editUser['username']) ? $editUser['username'] : ''); ?>"
+                required>
       </div>
       <div class="col">
         <label>Password</label>
-        <input name="password" class="form-control" type="password" minlength="3" value="<?php echo escape($editUser['password'] ?? ''); ?>" required>
+        <input  name="password"
+                type="password"
+                class="form-control"
+                minlength="3"
+                value="<?php echo escape(isset($editUser['password']) ? $editUser['password'] : ''); ?>"
+                required>
       </div>
     </div>
 
@@ -180,54 +203,77 @@ $pages = ceil($total / $perPage);
     <div class="row mb-2">
       <div class="col">
         <label>Email</label>
-        <input name="email" type="email" class="form-control" value="<?php echo escape($editUser['email'] ?? ''); ?>" required>
+        <input  name="email"
+                type="email"
+                class="form-control"
+                value="<?php echo escape(isset($editUser['email']) ? $editUser['email'] : ''); ?>"
+                required>
       </div>
       <div class="col">
         <label>Phone</label>
-        <input name="phone" class="form-control" title="Digits, spaces, hyphens or + only" value="<?php echo escape($editUser['phone'] ?? ''); ?>" required>
+        <input  name="phone"
+                class="form-control"
+                pattern="^[0-9+\-\s]+$"
+                value="<?php echo escape(isset($editUser['phone']) ? $editUser['phone'] : ''); ?>"
+                required>
       </div>
     </div>
 
-    <!-- address 1 and 2 -->
+    <!-- address lines -->
     <div class="mb-2">
-      <label>Address Line 1</label>
-      <input name="address_line1" class="form-control" value="<?php echo escape($editUser['address_line1'] ?? ''); ?>" required>
+      <label>Address&nbsp;Line&nbsp;1</label>
+      <input  name="address_line1"
+              class="form-control"
+              value="<?php echo escape(isset($editUser['address_line1']) ? $editUser['address_line1'] : ''); ?>"
+              required>
     </div>
     <div class="mb-2">
-      <label>Address Line 2</label>
-      <input name="address_line2" class="form-control" value="<?php echo escape($editUser['address_line2'] ?? ''); ?>">
+      <label>Address&nbsp;Line&nbsp;2</label>
+      <input  name="address_line2"
+              class="form-control"
+              value="<?php echo escape(isset($editUser['address_line2']) ? $editUser['address_line2'] : ''); ?>">
     </div>
 
     <!-- eircode and role -->
     <div class="row mb-3">
       <div class="col">
         <label>Eircode</label>
-        <input name="eircode" class="form-control" title="Only letters and numbers" value="<?php echo escape($editUser['eircode'] ?? ''); ?>" required>
+        <input  name="eircode"
+                class="form-control"
+                value="<?php echo escape(isset($editUser['eircode']) ? $editUser['eircode'] : ''); ?>"
+                required>
       </div>
       <div class="col">
         <label>Role</label>
         <select name="role" class="form-select" required>
           <?php
           $roles = ['ADMIN', 'USER', 'CUSTOMER'];
-          foreach ($roles as $role) {
-            $selected = (isset($editUser['role']) && $editUser['role'] === $role) ? 'selected' : '';
-            echo "<option value=\"$role\" $selected>$role</option>";
+          foreach ($roles as $r) {
+              $sel = (isset($editUser['role']) && $editUser['role'] === $r) ? 'selected' : '';
+              echo "<option value=\"$r\" $sel>$r</option>";
           }
           ?>
         </select>
       </div>
     </div>
 
+    <!-- add, delete and save buttons -->
     <div class="d-flex justify-content-between">
-      <a href="users.php" class="btn orange-btn">Add New</a>
+      <a href="users.php" class="btn orange-btn">Add&nbsp;New</a>
       <?php if ($editUser): ?>
-        <button type="submit" name="action" value="delete" class="btn orange-btn" onclick="return confirm('Are you sure?')">Delete</button>
+        <button type="submit"
+                name="action"
+                value="delete"
+                class="btn orange-btn"
+                onclick="return confirm('Are you sure?')">
+          Delete
+        </button>
       <?php endif; ?>
       <button type="submit" name="action" value="save" class="btn orange-btn">Save</button>
     </div>
   </form>
 
-  <!-- TABLE part -->
+  <!-- table -->
   <table class="table table-bordered text-center table-hover">
     <thead class="table-dark">
       <tr>
@@ -241,16 +287,16 @@ $pages = ceil($total / $perPage);
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($users as $user): ?>
-        <tr class="<?php echo (isset($_GET['id']) && $_GET['id'] == $user['id']) ? 'table-success' : ''; ?>">
-          <td><?php echo $user['id']; ?></td>
-          <td><?php echo escape($user['username']); ?></td>
-          <td><?php echo $user['role']; ?></td>
-          <td><?php echo escape($user['name']); ?></td>
-          <td><?php echo escape($user['surname']); ?></td>
-          <td><?php echo escape($user['email']); ?></td>
+      <?php foreach ($users as $u): ?>
+        <tr class="<?php echo (isset($_GET['id']) && $_GET['id'] == $u['id']) ? 'table-success' : ''; ?>">
+          <td><?php echo $u['id']; ?></td>
+          <td><?php echo escape($u['username']); ?></td>
+          <td><?php echo $u['role']; ?></td>
+          <td><?php echo escape($u['name']); ?></td>
+          <td><?php echo escape($u['surname']); ?></td>
+          <td><?php echo escape($u['email']); ?></td>
           <td>
-            <a href="users.php?id=<?php echo $user['id']; ?>" class="btn btn-sm orange-btn">Edit</a>
+            <a href="users.php?id=<?php echo $u['id']; ?>" class="btn btn-sm orange-btn">Edit</a>
           </td>
         </tr>
       <?php endforeach; ?>
