@@ -7,8 +7,8 @@ html, body {
     font-family: "Trebuchet MS", sans-serif;
     color: #333;
   }
-
-/* Orange button */
+  
+  /* Orange button */
 .orange-btn {
   background-color: #FF5E1D;
   color: #ffffff;
@@ -74,7 +74,6 @@ html, body {
   }
 
 
-
 /* LOGIN
 -------------------------*/
 .login-section {
@@ -127,6 +126,86 @@ html, body {
 .page-link:hover {
   background-color: #92D36E;
   color: #1C2C39;
+}
+
+/* SHOP
+-------------------------*/
+
+.shop-section {
+  background-color: #fff;
+}
+
+/* Grid spacing */
+.product-grid {
+  row-gap: 2rem;
+}
+
+/* Filter buttons */
+.filter-buttons .btn {
+  margin: 0 0.5rem;
+}
+
+.filter-btn {
+  background-color: #FF5E1D;
+  color: #fff;
+}
+.filter-btn:hover {
+  background-color: #92D36E;
+  color: #1C2C39;
+}
+.active-filter {
+  background-color: #92D36E !important;
+  color: #fff !important;
+  border: none;
+}
+
+/* Add button */
+.add-button {
+  background-color: #FF5E1D;
+  color: #fff;
+  border: none;
+}
+.add-button:hover {
+  background-color: #92D36E;
+  color: #1C2C39;
+}
+
+/* Product card */
+.product-card {
+  border: none;
+  transition: transform 0.2s ease-in-out;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Image wrapper */
+.product-image-wrapper {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+.product-image {
+  max-height: 160px;
+  object-fit: contain;
+}
+
+/* Quantity layout */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.qty-input {
+  max-width: 70px;
+}
+
+.available-text {
+  white-space: nowrap;
 }
 
   /* FOOTER
