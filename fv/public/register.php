@@ -1,6 +1,6 @@
 <?php
 require_once '../template/header.php';  // session_start
-require_once '../private/pr_register.php.php';  // php part
+require_once '../private/pr_register.php';  // php part
 ?>
 
 <!-- HTML part ----------------------------------------- -->
