@@ -26,7 +26,7 @@ $cart = $_SESSION['cart'];
 $errors = [];
 
 // handle POST action
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_POST['update_qty']) || isset($_POST['remove_item'])) {
   $index = isset($_POST['index']) ? $_POST['index'] : -1;
 
   if (isset($cart[$index])) {
